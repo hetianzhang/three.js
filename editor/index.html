@@ -47,7 +47,7 @@
 		
 		<!-- add ammo.js to editor -->
 		<!-- <script src="https://cdn.jsdelivr.net/gh/kripken/ammo.js@HEAD/builds/ammo.wasm.js"></script> -->
-		<!-- <script src="js/libs/ammo.wasm.js"></script> -->
+		<script src="js/libs/ammo.wasm.js"></script>
 		
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -77,7 +77,9 @@
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 			//import { OrbitControls } from './js/OrbitControls.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Ammo } from './js/libs/ammo.wasm.js'
+			// import { Ammo } from './js/libs/ammo.wasm.js'
+			import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
+
 			//import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 			window.URL = window.URL || window.webkitURL;
@@ -87,7 +89,8 @@
 			window.OrbitControls = OrbitControls;
 
 			//set global acess to Ammo
-			window.Ammo = Ammo;
+			//window.Ammo = Ammo;
+			window.physics = await AmmoPhysics();;
 
 			Number.prototype.format = function () {
 
@@ -233,13 +236,14 @@
 
 			onWindowResize();
 
-			//add eventListener for ammo physical engine
-			// window.addEventListener('DOMContentLoaded', async () => {
-			// 	Ammo().then((lib) => {
-			// 		Ammo = lib;
-			// 		//start app then
-			// 	});
-			// });
+			// add eventListener for ammo physical engine
+			window.addEventListener('DOMContentLoaded', async () => {
+				Ammo().then((lib) => {
+					// Ammo = lib;
+					window.Ammo = lib;
+					//start app then
+				});
+			});
 
 			//
 

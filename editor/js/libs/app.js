@@ -12,8 +12,9 @@ var APP = {
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
 		//add OrbitControls
-		var controls;
+		//var controls;
 		//add ammo engine
+		//var physics;
 
 		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
 
@@ -30,13 +31,34 @@ var APP = {
 		//add ammo default collision configuration to the player
 		this.collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
 		this.dispatcher = new Ammo.btCollisionDispatcher(this.collisionConfiguration);
+
+		console.log('physicalWorld');
+		console.log(this.collisionConfiguration);
+
 		this.broadphase = new Ammo.btDbvtBroadphase();
+		console.log('broadphase', this.broadphase);
+
 		this.solver = new Ammo.btSequentialImpulseConstraintSolver();
+		console.log('solver', this.solver);
+	
 		this.physicalWorld = new Ammo.btDiscreteDynamicsWorld(this.dispatcher, this.broadphase, this.solver, this.collisionConfiguration);
-		this.physicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
+		this.physicalWorld.setGravity(new Ammo.btVector3(0, -10, 0));
+		console.log('physicalWorld', this.physicalWorld);
 
+		
+		//add ammophysics
+		// console.log(physics);
 
+		// const floor = new THREE.Mesh(
+		// 	new THREE.BoxGeometry( 10, 5, 10 ),
+		// 	new THREE.ShadowMaterial( { color: 0x111111 } )
+		// );
+		// floor.position.y = - 2.5;
+		// floor.receiveShadow = true;
+		// scene.add( floor );
+		// physics.addMesh( floor );
 
+		
 
 		//load the setup in a json format that user going to play
 		this.load = function ( json ) {
@@ -89,6 +111,9 @@ var APP = {
 					continue;
 
 				}
+
+				//TODO: add all object to physics for testing
+				// physics.addMesh( object, 1 );
 
 				var scripts = json.scripts[ uuid ];
 
@@ -144,9 +169,10 @@ var APP = {
 			camera = value;
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
-			//new add Orbit Controls to the set camera
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.update();
+
+			//TODO: add add Orbit Controls to the set camera
+			this.controls = new OrbitControls( camera, renderer.domElement );
+			this.controls.update();
 		};
 
 		this.setScene = function ( value ) {
@@ -194,7 +220,7 @@ var APP = {
 			time = performance.now();
 
 			try {
-
+				//update(event) event parameter: holds time and delta property
 				dispatch( events.update, { time: time - startTime, delta: time - prevTime } );
 
 			} catch ( e ) {
@@ -204,8 +230,8 @@ var APP = {
 			}
 
 			//ignore the dispatch event update methods for now
-			const timeElapsedS = time - prevTime;
-			this.physicalWorld.stepSimulation(timeElapsedS, 10);
+			// const timeElapsedS = time - prevTime;
+			// this.physicalWorld.stepSimulation(timeElapsedS, 10);
 
 
 			renderer.render( scene, camera );
@@ -264,7 +290,7 @@ var APP = {
 
 			camera = undefined;
 			scene = undefined;
-			controls = undefined;
+			this.controls = undefined;
 
 		};
 
