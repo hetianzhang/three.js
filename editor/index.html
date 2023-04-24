@@ -44,7 +44,11 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
-
+		
+		<!-- add ammo.js to editor -->
+		<!-- <script src="https://cdn.jsdelivr.net/gh/kripken/ammo.js@HEAD/builds/ammo.wasm.js"></script> -->
+		<!-- <script src="js/libs/ammo.wasm.js"></script> -->
+		
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
 		<script async src="js/libs/es-module-shims.js"></script>
@@ -71,9 +75,19 @@
 			import { Menubar } from './js/Menubar.js';
 			import { Resizer } from './js/Resizer.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			//import { OrbitControls } from './js/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Ammo } from './js/libs/ammo.wasm.js'
+			//import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			//set global access to OrbitControls
+			window.OrbitControls = OrbitControls;
+
+			//set global acess to Ammo
+			window.Ammo = Ammo;
 
 			Number.prototype.format = function () {
 
@@ -218,6 +232,14 @@
 			window.addEventListener( 'resize', onWindowResize );
 
 			onWindowResize();
+
+			//add eventListener for ammo physical engine
+			// window.addEventListener('DOMContentLoaded', async () => {
+			// 	Ammo().then((lib) => {
+			// 		Ammo = lib;
+			// 		//start app then
+			// 	});
+			// });
 
 			//
 

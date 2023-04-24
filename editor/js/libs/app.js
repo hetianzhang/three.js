@@ -1,3 +1,7 @@
+// add OrbitControls to the app deafult camera for a test
+// import { OrbitControls } from '../OrbitControls.js';
+// import { Ammo } from './js/libs/ammo.wasm.js'
+
 var APP = {
 
 	Player: function () {
@@ -7,6 +11,9 @@ var APP = {
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
+		//add OrbitControls
+		var controls;
+		//add ammo engine
 
 		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
 
@@ -20,6 +27,18 @@ var APP = {
 		this.width = 500;
 		this.height = 500;
 
+		//add ammo default collision configuration to the player
+		this.collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+		this.dispatcher = new Ammo.btCollisionDispatcher(this.collisionConfiguration);
+		this.broadphase = new Ammo.btDbvtBroadphase();
+		this.solver = new Ammo.btSequentialImpulseConstraintSolver();
+		this.physicalWorld = new Ammo.btDiscreteDynamicsWorld(this.dispatcher, this.broadphase, this.solver, this.collisionConfiguration);
+		this.physicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
+
+
+
+
+		//load the setup in a json format that user going to play
 		this.load = function ( json ) {
 
 			var project = json.project;
@@ -34,6 +53,7 @@ var APP = {
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
 
+			//define global function for scripts
 			events = {
 				init: [],
 				start: [],
@@ -46,6 +66,7 @@ var APP = {
 				update: []
 			};
 
+			//global var object for scripts
 			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
 
@@ -100,12 +121,32 @@ var APP = {
 
 		};
 
+		this.getCamera = function () {
+
+			return this.camera;
+
+		}
+
+		this.getScene = function () {
+
+			return this.scene;
+
+		}
+
+		this.getControl = function () {
+
+			return this.controls;
+
+		}
+
 		this.setCamera = function ( value ) {
 
 			camera = value;
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
-
+			//new add Orbit Controls to the set camera
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.update();
 		};
 
 		this.setScene = function ( value ) {
@@ -162,6 +203,11 @@ var APP = {
 
 			}
 
+			//ignore the dispatch event update methods for now
+			const timeElapsedS = time - prevTime;
+			this.physicalWorld.stepSimulation(timeElapsedS, 10);
+
+
 			renderer.render( scene, camera );
 
 			prevTime = time;
@@ -174,6 +220,7 @@ var APP = {
 
 			startTime = prevTime = performance.now();
 
+			//TODO Add Event Listener here
 			document.addEventListener( 'keydown', onKeyDown );
 			document.addEventListener( 'keyup', onKeyUp );
 			document.addEventListener( 'pointerdown', onPointerDown );
@@ -211,16 +258,18 @@ var APP = {
 		};
 
 		this.dispose = function () {
-
+			//Frees the GPU-related resources allocated by this instance. 
+			//Call this method whenever this instance is no longer used in your app.
 			renderer.dispose();
 
 			camera = undefined;
 			scene = undefined;
+			controls = undefined;
 
 		};
 
 		//
-
+		
 		function onKeyDown( event ) {
 
 			dispatch( events.keydown, event );
