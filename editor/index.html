@@ -63,7 +63,21 @@
 		</script>
 
 		<script type="module">
-
+			//force dark color scheme via mediaMedia and add
+			const prefersDarkScheme = window.matchMedia('( prefers-color-scheme: dark )');
+			console.log(prefersDarkScheme)
+			if (prefersDarkScheme.matches) {
+				console.log('dark-theme');
+				document.body.classList.remove('light-theme');
+				// document.body.classList.add('dark-theme');
+				//document.body.classList.toggle("light-theme");
+			} else {
+				console.log('light-theme');
+				document.body.classList.add('light-theme');
+				// document.body.classList.remove('dark-theme');
+				//document.body.classList.toggle("dark-theme");
+			}
+			
 			import * as THREE from 'three';
 
 			import { Editor } from './js/Editor.js';
